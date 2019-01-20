@@ -1,0 +1,2 @@
+#!/bin/bash
+plt-r5rs test.scm
