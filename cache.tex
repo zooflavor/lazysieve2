@@ -44,10 +44,10 @@ Az edénysor szita műveletigényének nagyságrendjét már kiszámoltam, egés
 Ebben a doksiban megpróbálok pontosabb becslést adni, és ugyanazzal a módszerrel kiszámolom két cache algoritmussal is a műveletigényt.
 
 A módszer két ötleten alapul, és nagyon sok számoláson.
-Az első ötlet a szokásos feladatmegoldóötlet: jól kell megfogalmazni a problémát.
-A szita prím-pozíció párok újraszámolásánál pontosan annyiszor rak egy vödörba egy párt, ahányszor egy számjegyet újra kell számolni a pozícióban.
+Az első ötlet a szokásos feladatmegoldó-ötlet: jól kell megfogalmazni a problémát.
+A szita prím-pozíció párok újraszámolásánál pontosan annyiszor rak egy vödörbe egy párt, ahányszor egy számjegyet újra kell számolni a pozícióban.
 
-Ha $a$ a számrendszer alapja, $p$ egy prím, és $n=a^m$-ig szitálunk, akkor a $p$ poziciójának $k$. helyiérték újraszámolásainak számát meg tudjuk becsülni.
+Ha $a$ a számrendszer alapja, $p$ egy prím, és $n=a^m$-ig szitálunk, akkor a $p$ pozíciójának $k$. helyiérték újraszámolásainak számát meg tudjuk becsülni.
 Ha $p <= a^k$, akkor $a^{m-k}$-szor kell újraszámolni a helyiértéket.
 Ha $p > a^k$, akkor kb. $\frac{n}{p}$-szer. Az egész lerajzolható egy prefixfában, itt most $a=3$, $n=27$ (majdnem), $p=7$.
 
@@ -168,10 +168,10 @@ A könnyebb számolás kedvéért ezt $k+\log_{a}(n)$-nek vettem.
 
 A cache mérete számjegyekben $2m\pi(c)$ kell legyen, hogy bármelyik $\pi(c)$ db. prím-pozíciót képes legyen tárolni. A túl jó cache-nél ezt a műveletigényt veszem garantáltan megspóroltnak.
 
-A szalag-modell másik probélámja, hogy az optimális cache algoritmust nem ismerem.
+A szalag-modell másik problémája, hogy az optimális cache algoritmust nem ismerem.
 Már az kérdés, hogy a párok számát, vagy a számjegyek számát vesszük a cache méretnek.
 Ha a párok számát, akkor ugyanaz az optimális algoritmus, mint a konstans idős vödröknél, de nem lesz minden számjegy kihasználva.
-Ha a számjegyek számát nézzük, akkor valószínűleg a cache-ben kihasznált számjegyek számának maximalizálása nem esik egybe a legközebb szitáló párok kiválasztásával.
+Ha a számjegyek számát nézzük, akkor valószínűleg a cache-ben kihasznált számjegyek számának maximalizálása nem esik egybe a legközelebb szitáló párok kiválasztásával.
 
 A sok-sok levezetésben igyekeztem az $R$-eknek elnevezett hibatagokat végigcipelni a számításon.
 Egyrészt így nyugodtan egyenlőségjelet használhattam mindenhol.
@@ -750,6 +750,8 @@ L_K(n)- L_{OPT}(n) <& L_K(n)- L_T(n) = L_{K,1}(n) + L_{K,2}(n) - L_{T,1}(n) + L_
 
 \section{Összefoglalás}
 
+A fontos eredmény: a domináns tagja az optimális cache-nek ugyanaz, mint a kis prímek cache-nek.
+
 \begin{tabular}{|l|l|l|l|}
 \hline
 Model & Cache & Domináns tag & Eddig ismert \\
@@ -773,10 +775,17 @@ További munka lenne:
 \item a számítások átláthatóbbá tétele
 \item a hibatagok becslése
 \item a dokumentum formázása
-\item a probélma és a megoldás világosabbá tétele
+\item a probléma és a megoldás világosabbá tétele
 \item a számítást egyszerűsítő kisebb csalások felszámolása
+\begin{itemize}
+\item $n$-ig vagy $n-1$-ig szitálva
+\item nem csak $n=a^m$
+\item nem csak $c=a^d$, és cache méret $=\pi(c)$
+\item szalagos cache-nél nem $2m\pi(c)$, hanem $2(m+1)\pi(c)$ számjegy kéne
+\item szalagnál a műveletigény nem $k+\log_{a}(p)$, hanem $k+\lceil\log_{a}(p)\rceil+1$ kéne
+\end{itemize}
 \item szimulációval összevetni
-\item nyilatkozni kéne a kisprímek $<$ optimális $<$ túl jó cache kézlegyintésről
+\item nyilatkozni kéne a kis prímek $<$ optimális $<$ túl jó cache kézlegyintésről
 \end{itemize}
 
 \end{document}
