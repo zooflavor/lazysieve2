@@ -788,4 +788,10 @@ További munka lenne:
 \item nyilatkozni kéne a kis prímek $<$ optimális $<$ túl jó cache kézlegyintésről
 \end{itemize}
 
+További ihlet esetén cache-optimalitás jellegű kérdést is lehetne vizsgálni. Az edénysor egy új részfába kezdve a részfa összes osztóját újrarendezi. Ha a cache-ben elfér az összes osztó, akkor az a részfa ingyen van.
+
+$n$-ig szitálva a megjelelölések száma $\approx n \ln{\ln{n}}$. Azaz nagyon messziről nézve egy szám osztóinak  várható száma $\ln{\ln{n}}$. Tovább hunyorítva egy $k$ magas részfában az osztók száma $a^{k-1} \ln{\ln{n}}$. Legyen $c$ a cache mérete. Ekkor a $c \ge a^{k-1} \ln{\ln{n}}$ megoldása $k \le 1 + \lfloor \log_{a}{\frac{c}{\ln{\ln{n}}}} \rfloor$.
+
+Arra lennék kíváncsi, hogy így megválasztva $k$-t, mennyi a valószínűsége egy adott részfára, hogy tényleg elfér a cache-ben az összes osztó. Az örök kérdés meg az, hogy ez vezet-e valahova.
+
 \end{document}
