@@ -1,0 +1,147 @@
+\documentclass{article}
+\usepackage[magyar]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{pgfplots}
+\usepackage{tikz-qtree}
+
+\lstset{literate=
+  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+  {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+  {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+  {€}{{\euro}}1 {£}{{\pounds}}1 {«}{{\guillemotleft}}1
+  {»}{{\guillemotright}}1 {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1
+}
+
+\pgfplotsset{compat=1.9}
+
+\begin{document}
+
+\tableofcontents
+
+\section{Bevezető}
+
+Ezt a sievecompress  programot azért írtam, hogy legyen hol kipróbáljak ötleteket a szitatáblák tömörítésére.
+
+Különösebb izgalom nincs benne. Fogtam egy marék elkészült szitatáblát, amit a szakdolgozattal generáltam. Vettem vad ötleteket, és megírtam a tömörítést. Ha nem volt reménytelen se a tömörítés ideje, se a tömörített méret, akkor megírtam a kitömörítést is ellenőrzésnek.
+
+A tömörítés idejével nagyon nem törődtem, megelégedtem azzal, ha 10-20-30 perc alatt ki tudtam próbálni a marék szitatáblán, és el tudtam képzelni, hogy szükség esetén hatákonyan implementálható.
+
+\section{Eredemény}
+
+A vagdalkozásban találtam olyan algoritmust, ami a szitatábla egyszeri sorban végigolvasásával a Huffman-kódhoz hasonlóan jó aránnyal tömöríti a szitatáblát. A hasonlóan jó azt jelenti, hogy kb. +12-15\% a Huffman-hoz képest.
+
+Van egy nagy táblázat az eredményről, az out.ods. Az oszlopai:
+\begin{itemize}
+\item segment start
+\item ln(end): a szegmeny utolsó számának logaritmusa, a prímszámtétel szerint ekkora egy átlagos prímhézag
+\item huffman/uncompressed
+\item var1/uncompressed
+\item var1 var0123: a var1 tömörítéshez használt paraméterek
+\item log\_2(ln(end)/2): a var1 paraméterének tippje
+\item var2/uncompressed
+\item var2 var0123: a var2 tömörítéshez használt paraméterek
+\item log\_2(ln(end)/6): a var2 paraméterének tippje
+\item block(bitmap)/uncompressed
+\item block(bitmap) length: a használt blockméret
+\end{itemize}
+
+\section{Algoritmusok}
+
+Ezek elég pongyola leírásai az ötleteknek. Szükség esetére ott van a futtatható kód.
+
+\subsection{Huffman}
+
+\begin{itemize}
+\item a szitatáblát bitmap-ből átalakítja a prímek listájává
+\item a prímek listáját átalakítja a prímhézagok listájává
+\item megszámolja a prímhézagok előfordulását
+\item előállítja a kódfát
+\item kódolja a prímhézagok listáját
+\end{itemize}
+
+Ez a legjobb tömörítés, amit kipróbáltam. Legalább kétszer végig kell olvassa a szitatáblát. A hatékony tömörítést el tudom képzelni szótárral, a kitömörítést nem annyira. Biztos lehetne erről sokat olvasni.
+
+\subsection{Var1}
+
+A "var" a variable length encoding-ból született.
+
+\begin{itemize}
+\item a szitatáblát bitmap-ből átalakítja a prímek listájává
+\item a prímek listáját átalakítja a prímhézagok listájává
+\item gondol 4 darab kicsi pozitív egészre, $a$, $b$, $c$, $d$
+\item kódolja a prímhézagokat sorban:
+\begin{itemize}
+\item osztja kettővel a prímhézagot
+\item a kimenetbe átshifteli a hézag alsó $a$ bitjét
+\item ha a hézag 0 lett, akkor kiír egy 0 bitet
+\item különben kiír egy 1 bitet, és kishiftel $b$ bitet a hézagból
+\item ha a hézag 0 lett, akkor kiír egy 0 bitet
+\item különben kiír egy 1 bitet, és kishiftel $c$ bitet a hézagból
+\item ha a hézag 0 lett, akkor kiír egy 0 bitet
+\item különben kiír egy 1 bitet, és kishiftel $d$ bitet a hézagból
+\item amíg nem 0 a hézag
+\begin{itemize}
+\item kiír egy 1 bitet
+\item kishiftel 1 bitet a hézagból
+\end{itemize}
+\item kiír egy 0 bitet
+\end{itemize}
+\end{itemize}
+
+A számok kigondolását úgy írtam meg, hogy összeszedi a hézagok előfordulását, és brute-forca-szal megkeresi azt, ami a legkisebb méretet eredményezné.
+
+A kis tesztem alapján a következő jött ki:
+\begin{itemize}
+\item csak az első szám külöbözik 1-től
+\item az első szám is olyan, mintha nagyon lassan növekedő monoton valami lenne
+\end{itemize}
+
+Az egymenetben tömörítést úgy képzelem, hogy ezt az egyetlen lassúcska paramétert előzetes tesztek alapján beégetjük. A hatékonyságot meg az adhatja, hogy az egész csak shift-ekből és konstansokkal összehasonlításokból áll.
+
+\subsection{Var2}
+
+Szinte ugyanaz, mint a var1. A különbség az, hogy a prímhézagot nem kettővel osztja, hanem
+\begin{itemize}
+\item ha a hézag mod 6 = 0, akkor kiír egy 0 bitet
+\item ha a hézag mod 6 = 2, akkor kiírja az 10 biteket
+\item ha a hézag mod 6 = 4, akkor kiírja az 11 biteket
+\item osztja hattal a hézagot
+\end{itemize}
+
+A tesztek alapján úgy tűnik, hogy elég messze szitálva egy icipicivel jobb, mint a var1. Nehéz megmondani, hogy megéri-e az extra komplexitást.
+
+\subsection{Block(bitmap)}
+
+Az inverz szita alapján gondoltam, hogy próbálkozok olyan tömörítéssel, ami a szitatábla bitmap-jét blockokra vágva tömörít. Nem sok sikert értem el, de legalább minden ötletem nagyon lassú is volt.
+
+Egyet azért megtartottam, hogy újabb ötletnél legyen valami kiindulásnak.
+
+\begin{itemize}
+\item gondol egy blokkméretre
+\item veszi sorban a blokkokat
+\begin{itemize}
+\item ha egy prím sincs a blokkban, akkor kiír egy 0 bitet
+\item különben kiír egy 1 bitet, és a blokk bitmapjét
+\end{itemize}
+\end{itemize}
+
+\end{document}
